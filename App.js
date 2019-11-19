@@ -11,10 +11,13 @@ import {FlatList, SafeAreaView, Text, View} from 'react-native';
 import {PermissionsAndroid} from 'react-native';
 import Contacts from 'react-native-contacts';
 
-function Item({title}) {
+function Item({title, numbers}) {
+  const mainNumber = numbers[0] && numbers[0].number ? numbers[0].number : '';
   return (
     <View>
-      <Text>{title}</Text>
+      <Text>
+        {title} - {mainNumber}
+      </Text>
     </View>
   );
 }
@@ -59,7 +62,9 @@ class App extends React.Component {
       <SafeAreaView>
         <FlatList
           data={contactsList}
-          renderItem={({item}) => <Item title={item.givenName} />}
+          renderItem={({item}) => (
+            <Item title={item.givenName} numbers={item.numbers} />
+          )}
           keyExtractor={item => item.id}
           ListHeaderComponent={<Text>My Contacts</Text>}
         />
