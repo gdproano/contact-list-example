@@ -7,11 +7,26 @@
  */
 
 import React from 'react';
-import {Text} from 'react-native';
+import {FlatList, SafeAreaView, Text, View} from 'react-native';
 import {PermissionsAndroid} from 'react-native';
 import Contacts from 'react-native-contacts';
 
+function Item({title}) {
+  return (
+    <View>
+      <Text>{title}</Text>
+    </View>
+  );
+}
+
 class App extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      contactsList: [],
+    };
+  }
+
   componentDidMount() {
     PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.READ_CONTACTS, {
       title: 'Contacts',
@@ -22,14 +37,34 @@ class App extends React.Component {
           // error
         } else {
           // contacts returned in Array
-          console.warn('contacts: ', contacts);
+          const formattedContacts = contacts.map(
+            ({id, givenName, phoneNumbers}) => {
+              return {
+                id,
+                givenName,
+                numbers: phoneNumbers,
+              };
+            },
+          );
+          console.warn('contacts: ', formattedContacts);
+          this.setState({contactsList: formattedContacts});
         }
       });
     });
   }
 
   render() {
-    return <Text>Hello, {this.props.name}</Text>;
+    const {contactsList} = this.state;
+    return (
+      <SafeAreaView>
+        <FlatList
+          data={contactsList}
+          renderItem={({item}) => <Item title={item.givenName} />}
+          keyExtractor={item => item.id}
+          ListHeaderComponent={<Text>My Contacts</Text>}
+        />
+      </SafeAreaView>
+    );
   }
 }
 
